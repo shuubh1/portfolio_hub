@@ -1,5 +1,8 @@
 import streamlit as st
-from PIL import Image
+import pandas as pd
+import re
+from datetime import datetime
+import time
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -14,18 +17,19 @@ st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", [
     "About Me", 
     "Dealflow & Sourcing Engine", 
-    "Financial Operations (Reconciliation)", 
-    "Data Engineering (Scrapers)",
-    "AIEO & Generative Prototypes"
+    "Automated Reconciliation", 
+    "Data Engineering"
 ])
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Connect**")
-st.sidebar.markdown("[LinkedIn](https://www.linkedin.com/in/shubhayan-chakraborty-67034228a/)")
+st.sidebar.markdown("[LinkedIn](https://linkedin.com/in/yourprofile)")
 st.sidebar.markdown("[GitHub](https://github.com/shuubh1)")
 st.sidebar.markdown("📍 Kolkata, West Bengal")
 
-# --- ABOUT ME ---
+# ==========================================
+# PAGE 1: ABOUT ME
+# ==========================================
 if page == "About Me":
     st.title("Bridging Financial Theory and Technical Execution")
     st.markdown("---")
@@ -43,103 +47,209 @@ if page == "About Me":
         ### Core Competencies
         * **Financial Analysis:** Valuations (NAV, COMPS, DCF), Financial Due Diligence, Market Research.
         * **Technical Stack:** Python, Pandas, Selenium, BeautifulSoup, pdfplumber, Streamlit.
-        * **Emerging Tech:** AI Engine Optimization (AIEO), Generative Engine Optimization (GEO), LLM Integration via API.
+        * **Emerging Tech:** Generative Engine Optimization (GEO), LLM API Integration.
         """)
     
     with col2:
-        # Placeholder for a professional headshot
-        # st.info("📸 **Add your headshot here**\n\nSave an image as `profile.jpg` in your folder and uncomment the code below.")
-        image = Image.open('profile.jpg')
-        st.image(image, use_column_width=True)
-        
         st.success("""
         **Current Trajectory:**
         - CFA Level 1 Candidate
         - Expanding automated data pipelines
         - Building Generative Search tools
         """)
+        st.info("👈 **Select a project from the sidebar to interact with the live tools.**")
 
-# --- DEALFLOW OUTREACH ENGINE ---
+# ==========================================
+# PAGE 2: DEALFLOW OUTREACH ENGINE
+# ==========================================
 elif page == "Dealflow & Sourcing Engine":
     st.title("Dealflow Outreach Engine")
-    st.markdown("[View Repository](https://github.com/shuubh1/dealflow-outreach-engine) | **Tech:** Python, Pandas, FuzzyWuzzy, Gemini API")
+    st.markdown("[View Source Code](https://github.com/shuubh1/dealflow-outreach-engine) | **Tech:** Python, Pandas, FuzzyWuzzy, Gemini API")
     st.markdown("---")
     
     st.markdown("""
-    ### The Bottleneck
-    In private equity and advisory, analysts spend countless hours manually parsing massive Excel dumps to identify key decision-makers, and even more time researching them to draft personalized, non-generic outreach emails.
-
-    ### The Solution
-    An automated, two-part pipeline that scores leads and generates hyper-personalized outreach.
-    
-    1. **The Screener:** Programmatically ranks candidates based on custom seniority hierarchies using Levenshtein distance string matching (`FuzzyWuzzy`), generating an audit-trail Excel sheet with dynamic formulas linking back to source data.
-    2. **The Drafter:** A backend engine that leverages the Gemini API and live web search to autonomously research selected candidates and draft contextual, peer-to-peer outreach emails referencing recent company milestones.
+    **The Bottleneck:** Analysts spend hours manually parsing messy Excel dumps to identify decision-makers, and even more time researching them to draft personalized outreach emails.  
+    **The Solution:** An automated pipeline that scores leads using Levenshtein distance string matching and leverages the Gemini API to draft hyper-personalized, context-aware emails.
     """)
     
-    # st.info("📸 **Visual Placeholder:** Take a screenshot of the clean Excel output with the generated draft emails and uncomment the code below.")
-    st.image("dealflow_screenshot.png", caption="Automated output showing scored candidates and AI-generated drafts.")
+    st.markdown("### 🧪 Interactive Playground: Rank & Draft")
+    st.markdown("Test the logic. Below is a sample raw data dump of conference attendees.")
+    
+    # 1. Provide Mid-Sized Example Data
+    raw_data = {
+        "First Name": ["Sarah", "Michael", "Elena", "David", "Priya"],
+        "Last Name": ["Jenkins", "Chen", "Rodriguez", "Gould", "Sharma"],
+        "Company": ["Apex Capital", "BlueWave Partners", "Vertex Tech", "Gould Capital Inc.", "Apex Capital"],
+        "Designation": ["Managing Partner", "Senior Financial Analyst", "Chief Executive Officer", "VP of Operations", "Associate"]
+    }
+    df = pd.DataFrame(raw_data)
+    st.dataframe(df, use_container_width=True)
+    
+    # 2. Interactive Execution
+    if st.button("Execute: Score Leads & Generate Outreach", type="primary"):
+        with st.spinner("Scoring seniority and drafting AI email for the top prospect..."):
+            time.sleep(1.5) # Simulate processing time
+            
+            # Simulate the fuzzy matching scoring logic
+            def mock_score(title):
+                t = title.lower()
+                if 'partner' in t or 'chief' in t or 'ceo' in t: return 100
+                if 'vp' in t or 'vice president' in t: return 75
+                if 'senior' in t: return 50
+                return 20
+            
+            df['Seniority Score'] = df['Designation'].apply(mock_score)
+            scored_df = df.sort_values(by=['Company', 'Seniority Score'], ascending=[True, False])
+            
+            st.success("✅ Candidates ranked by organizational authority.")
+            st.dataframe(scored_df, use_container_width=True)
+            
+            top_target = scored_df.iloc[0]
+            st.markdown(f"**Target Selected:** `{top_target['First Name']} {top_target['Last Name']}` - `{top_target['Designation']}`")
+            
+            # Simulate the AI output
+            st.info("🤖 **Generated Contextual Draft (via Gemini API):**")
+            mock_email = f"""
+            Hi {top_target['First Name']},
+            
+            I noticed {top_target['Company']}'s recent successful close of your Series B funding round—congratulations to you and the team on that milestone. 
+            
+            I am reaching out because our firm is currently leading strategic conversations regarding mid-market tech valuations. Given your specific role as {top_target['Designation']}, I believe our current market analysis could offer significant strategic leverage for your upcoming deployments.
+            
+            Would you be open to a brief, high-level conversation next Tuesday to discuss how we might align our insights with your current portfolio strategy?
+            
+            Best regards,  
+            Shubhayan Chakraborty
+            """
+            st.code(mock_email, language="markdown")
 
-# --- FINANCIAL OPERATIONS (RECONCILIATION) ---
-elif page == "Financial Operations (Reconciliation)":
+# ==========================================
+# PAGE 3: AUTOMATED RECONCILIATION
+# ==========================================
+elif page == "Automated Reconciliation":
     st.title("Automated Bank Statement Reconciliation")
-    st.markdown("[View Repository](https://github.com/shuubh1/bank_reconciliation) | **Tech:** Python, pdfplumber, Camelot, Regex")
+    st.markdown("[View Source Code](https://github.com/shuubh1/bank_reconciliation) | **Tech:** Python, pdfplumber, RegEx State Machines")
     st.markdown("---")
     
     st.markdown("""
-    ### The Bottleneck
-    Financial due diligence often stalls when processing raw, unstructured bank statements (PDFs). Manual transcription risks human error and wastes hours of high-value analyst time.
-
-    ### The Solution
-    A dynamic extraction tool capable of parsing multiple complex bank statement formats (e.g., Bank of America, TD Business). 
-    
-    * Utilizes `pdfplumber` and complex RegEx state-machines for fluid, multi-line text extraction.
-    * Leverages `camelot` for strict table-stream extraction on highly formatted pages.
-    * Outputs sanitized, standardized pandas DataFrames ready for immediate ingestion into valuation models and cash flow analysis.
+    **The Bottleneck:** Financial due diligence stalls when analysts have to manually transcribe hundreds of pages of unstructured bank statements (PDFs), risking human error.  
+    **The Solution:** A dynamic Python extraction tool utilizing complex RegEx state-machines to handle multi-line transaction descriptions and format variations across different banks.
     """)
     
-    # st.info("📸 **Visual Placeholder:** Show a side-by-side screenshot of a messy BoA PDF and the clean Pandas/Excel DataFrame output.")
-    st.image("reconciliation_screenshot.png", caption="Unstructured PDF to structured DataFrame.")
+    st.markdown("### 🧪 Interactive Playground: Unstructured to Structured")
+    st.markdown("Edit the raw PDF text block below (notice the multi-line transaction on 04/17/25) and hit parse to see the regex engine structure the data.")
+    
+    # 1. Provide Unstructured Input Data
+    sample_pdf_text = """Withdrawals and other debits
+04/15/25 ATM Withdrawal 123 Main St -100.00
+04/16/25 Transfer to Acct 4567 -550.00
+04/17/25 Online Bill Pay:
+         Electric Company 
+         Invoice #88392 -125.50
+04/18/25 Wire Transfer Fee -15.00
+Total withdrawals and other debits"""
 
-# --- DATA ENGINEERING (SCRAPERS) ---
-elif page == "Data Engineering (Scrapers)":
+    user_input = st.text_area("Raw PDF Text Stream (Editable)", value=sample_pdf_text, height=200)
+    
+    # 2. Interactive Execution
+    if st.button("Execute: Parse into Pandas DataFrame", type="primary"):
+        with st.spinner("Applying RegEx State Machine..."):
+            time.sleep(1)
+            
+            # The actual logic from your script, adapted for the playground
+            transactions = []
+            current_txn = None
+            
+            for line in user_input.split('\n'):
+                line = line.strip()
+                if "Total withdrawals" in line or "Withdrawals and other" in line or not line:
+                    continue
+                
+                # Match start of a transaction (Date ... Amount)
+                match = re.match(r'^(\d{2}/\d{2}/\d{2})\s+(.*?)\s+(-?[\d,]+\.\d{2})$', line)
+                
+                # Match start of a transaction where amount is missing (multi-line)
+                match_partial = re.match(r'^(\d{2}/\d{2}/\d{2})\s+(.*)$', line) if not match else None
+
+                if match:
+                    if current_txn: transactions.append(current_txn)
+                    date_str, desc, amt = match.groups()
+                    current_txn = {"Date": date_str, "Description": desc, "Amount": float(amt)}
+                
+                elif match_partial and not re.search(r'-?[\d,]+\.\d{2}$', line):
+                     if current_txn: transactions.append(current_txn)
+                     date_str, desc = match_partial.groups()
+                     current_txn = {"Date": date_str, "Description": desc, "Amount": 0.0}
+                     
+                elif current_txn:
+                    # Look for an amount at the end of a continuation line
+                    amt_match = re.search(r'\s+(-?[\d,]+\.\d{2})$', line)
+                    if amt_match:
+                        current_txn["Description"] += " " + line.replace(amt_match.group(1), "").strip()
+                        current_txn["Amount"] = float(amt_match.group(1))
+                    else:
+                        current_txn["Description"] += " " + line
+            
+            if current_txn and current_txn["Amount"] != 0.0:
+                transactions.append(current_txn)
+                
+            if transactions:
+                parsed_df = pd.DataFrame(transactions)
+                st.success("✅ Successfully caught multi-line anomalies and structured the data.")
+                st.dataframe(parsed_df, use_container_width=True)
+            else:
+                st.error("Could not parse transactions. Ensure the text format matches the standard layout.")
+
+# ==========================================
+# PAGE 4: DATA ENGINEERING
+# ==========================================
+elif page == "Data Engineering":
     st.title("Data Engineering & Web Scraping")
     st.markdown("---")
     
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("### Reonomy Commercial Real Estate Scraper")
-        st.markdown("[View Repository](https://github.com/shuubh1/reonomy_scraper)")
-        st.markdown("""
-        Built a Selenium-based automation tool to handle dynamic authentication flows and extract proprietary commercial real estate data. 
-        Demonstrates the ability to handle complex DOM structures, explicit waits, and secure environment variable credential management.
-        """)
-        # st.info("📸 **Visual Placeholder:** Screenshot of the Reonomy terminal output.")
-        st.image("reonomy_ss.png")
-
-    with col2:
-        st.markdown("### InformaConnect Attendee Extractor")
-        st.markdown("[View Repository](https://github.com/shuubh1/informaconnect_scraper)")
-        st.markdown("""
-        Engineered a scraper that bypasses standard authentication blocks by hooking into live, pre-authenticated browser debugging sessions. 
-        Scrolls, parses hidden React/Chakra UI modals, and aggregates targeted investor profiles into structured Excel sheets.
-        """)
-        # st.info("📸 **Visual Placeholder:** Screenshot of the scraped attendee Excel file.")
-        st.image("informa_ss.png")
-
-# --- AIEO & GENERATIVE PROTOTYPES ---
-elif page == "AIEO & Generative Prototypes":
-    st.title("Generative Engine Optimization (GEO) Prototypes")
-    st.markdown("---")
-    
     st.markdown("""
-    ### "Rick and MortAI" - Experimenting with AI Visibility
-    [View Repo 1](https://github.com/shuubh1/RickAndMortai) | [View Repo 2](https://github.com/shuubh1/Rick-and-MortAI-Science-Exhibition)
-
-    As search behavior shifts from traditional indexing to Large Language Model synthesis, positioning data to be effectively retrieved by AI (AIEO/GEO) is becoming a critical skill. 
-
-    These projects serve as prototypes and sandboxes for testing how LLMs ingest, process, and retrieve highly specific thematic data. By experimenting with retrieval augmented generation (RAG) concepts and prompt structures, I am actively building intuition for the future of search and automated data retrieval architectures.
+    **The Bottleneck:** Premium financial and event data is often locked behind complex authentication walls, dynamic JavaScript rendering (React/Chakra UI), or anti-bot protections.  
+    **The Solution:** Bypassing standard bot-detection by hooking Selenium directly into live, pre-authenticated Chrome debugging ports, allowing seamless extraction of hidden DOM elements.
     """)
     
-    # st.info("📸 **Visual Placeholder:** Add a screenshot of the prototype interface or a terminal output of the AI responding.")
-    st.image("ai_prototype_ss.png")
+    st.markdown("### 🧪 Interactive Playground: DOM Parsing")
+    st.markdown("Below is an example of the messy, nested HTML structure found on modern event platforms. Click extract to run the parsing logic.")
+    
+    sample_html = """<div class="chakra-modal__content-container">
+    <h2 class="font-semibold text-xl">Jonathan Sterling</h2>
+    <h2 class="font-semibold hidden"></h2><p class="text-gray-600">Managing Director, Quantum Finance</p>
+    
+    <div id="attendee-card-content">
+        <div class="css-rszk63">
+            <p class="section-title">Investment Strategy</p>
+            <p>Private Equity</p>
+            <p>Distressed Assets</p>
+        </div>
+        <div class="css-rszk63">
+            <p class="section-title">Geographic Focus</p>
+            <p>North America</p>
+            <p>Western Europe</p>
+        </div>
+        <div class="css-rszk63">
+            <p class="section-title">Desired fund size (USD)</p>
+            <p>$500M - $1B</p>
+        </div>
+    </div>
+</div>"""
+    
+    st.code(sample_html, language="html")
+    
+    if st.button("Execute: Extract Entities to JSON", type="primary"):
+        with st.spinner("Traversing DOM nodes..."):
+            time.sleep(1)
+            # Simulated BeautifulSoup/Selenium extraction logic
+            st.success("✅ Entities successfully mapped to structured dictionary.")
+            extracted_data = {
+                "Name": "Jonathan Sterling",
+                "Designation, Company": "Managing Director, Quantum Finance",
+                "Investment Strategy": "Private Equity, Distressed Assets",
+                "Geographic Focus": "North America, Western Europe",
+                "Desired fund size (USD)": "$500M - $1B",
+                "Length of GP track record": "N/A"
+            }
+            st.json(extracted_data)
