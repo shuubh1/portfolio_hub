@@ -24,7 +24,7 @@ page = st.sidebar.radio("Go to", [
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Connect**")
-st.sidebar.markdown("[LinkedIn](https://linkedin.com/in/yourprofile)")
+st.sidebar.markdown("[LinkedIn](https://linkedin.com/in/shubhayan-chakraborty-67034228a/)")
 st.sidebar.markdown("[GitHub](https://github.com/shuubh1)")
 st.sidebar.markdown("📍 Kolkata, West Bengal")
 
